@@ -1,13 +1,32 @@
-use aoc19::riddle::Riddles;
+use std::env;
+use std::io::{Error, ErrorKind};
+use std::vec::{Vec};
 
-use aoc19::io::{lines_from_file};
+use aoc19::riddle::riddlecontainer::{RiddleContainer};
 
-fn main() {
-    let _riddles = Riddles::new();
+fn main() -> Result<(), std::io::Error> {
+    let riddles = RiddleContainer::new();
 
-    // let x : Vec<_> = lines_from_file("./data/input.1.txt").collect();
-    // println!("{}", x.len());
-    
+    let args = {
+        let args : Vec<String> = env::args().collect();
+        if args.len() <= 1 {
+            return Err(Error::new(ErrorKind::Other, "expected at least one argument"))
+        }
+        args
+    };
 
-    println!("Hello, world!");
+    let riddle = args[1].to_string();
+    let remaining_args = if args.len() == 1 {
+        Vec::<String>::new()
+    } else {
+        args[1..].to_vec()
+    };
+
+    println!("Hello, world! {:?}", args);
+
+    let result = riddles.solve_riddle(riddle, &remaining_args)?;
+
+    println!("result: {:?}", result);
+
+    Ok(())
 }

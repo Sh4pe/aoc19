@@ -1,36 +1,35 @@
+use std::io::{ErrorKind};
+use std::error::{Error};
+use std::fmt;
 
+pub mod advent1;
+pub mod riddlecontainer;
+
+#[derive(Debug)]
 pub enum Solution {
     Number(i64)
 }
 
-pub enum Error {
+#[derive(Debug)]
+pub enum RiddleError {
+    UnknownRiddle(String),
     IO(std::io::Error),
     ArgumentsCount(u8, u8),
 }
 
-pub trait Riddle {
-    fn solve(self, args: &[String]) -> Result<Solution, Error>;
-}
-
-pub struct Riddles {
-
-}
-
-impl Riddles {
-    pub fn new() {}
-}
-
-#[cfg(test)]
-mod riddle_tests {
-    mod riddles_test {
-        mod constructor_tests {
-            use super::super::super::*;
-
-            #[test]
-            fn it_works() {
-                let _ = Riddles::new();
-                assert_eq!(1, 1);
-            }
-        }
+impl fmt::Display for RiddleError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+        
     }
+}
+
+impl Error for RiddleError {}
+
+impl std::convert::From<RiddleError> for std::io::Error {
+    fn from(err: RiddleError) -> Self { std::io::Error::new(ErrorKind::Other, err) }
+}
+
+pub trait Riddle {
+    fn solve(&self, args: &[String]) -> Result<Solution, RiddleError>;
 }
