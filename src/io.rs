@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead, Lines, Error};
 use std::vec::{Vec};
+use std::num::{ParseIntError};
 
 type FileLines = Lines<BufReader<File>>;
 
@@ -12,7 +13,7 @@ pub fn lines_from_file(filename: &str) -> Result<FileLines, Error> {
 
 #[derive(Debug)]
 pub enum IntsError {
-    Convert(String),
+    Convert(ParseIntError),
     ReadLine,
     IO(Error)
 }
@@ -21,16 +22,14 @@ impl std::convert::From<std::io::Error> for IntsError {
     fn from(err: std::io::Error) -> Self { IntsError::IO(err) }
 }
 
+impl std::convert::From<ParseIntError> for IntsError {
+    fn from(err: ParseIntError) -> Self { IntsError::Convert(err) }
+}
+
 pub fn ints_from_file(filename: &str) -> Result<Vec<i64>, IntsError> {
     let lines = lines_from_file(filename)?;
     let result : Result<Vec<i64>, _> = lines.map( |line| {
-        match line {
-            Err(_) => Err(IntsError::ReadLine),
-            Ok(l) => match l.parse::<i64>() {
-                Err(_) => Err(IntsError::Convert(format!("could not convert {} to int", l))),
-                Ok(i) => Ok(i)
-            }
-        }
+        Ok(line?.parse::<i64>()?)
     }).collect();
     result
 }
