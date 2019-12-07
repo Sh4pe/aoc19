@@ -1,4 +1,5 @@
 use super::{Riddle, Solution, RiddleError};
+use super::super::io::{ints_from_file};
 
 pub struct Advent1Riddle1 {
     input_file: String
@@ -12,13 +13,18 @@ impl Advent1Riddle1 {
 }
 
 impl Riddle for Advent1Riddle1 {
-    fn solve(&self, args: &[String]) -> Result<Solution, RiddleError> {
-        println!("asdfasdf");
-        Ok(Solution::Number(2))
+    fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
+        let ints = ints_from_file(&self.input_file).unwrap();
+
+        let result = ints
+            .iter()
+            .map( |&x| calculate_fuel(x) )
+            .fold(0, |acc, x| acc + x );
+        Ok(Solution::Number(result))
     }
 }
 
-pub fn calculate_fuel(mass: u64) -> u64 {
+pub fn calculate_fuel(mass: i64) -> i64 {
     assert!(mass >= 6);
     mass/3 - 2
 }
@@ -37,4 +43,17 @@ mod advent1_tests {
             assert_eq!(calculate_fuel(100756), 33583);
         }
     }
+
+    mod riddle1_test {
+        use super::super::Advent1Riddle1;
+        use super::super::super::{Riddle, Solution};
+
+        #[test]
+        fn it_works_as_expected() {
+            let riddle = Advent1Riddle1::new("./data/input/1.txt");
+            let solution = riddle.solve(&vec![]).unwrap();
+
+            assert_eq!(solution, Solution::Number(3210097));
+        }
+    } 
 }

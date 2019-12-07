@@ -5,7 +5,7 @@ use std::fmt;
 pub mod advent1;
 pub mod riddlecontainer;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Solution {
     Number(i64)
 }
