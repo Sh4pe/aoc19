@@ -3,6 +3,7 @@ use std::error::{Error};
 use std::fmt;
 
 pub mod advent1;
+pub mod advent2;
 pub mod riddlecontainer;
 
 #[derive(Debug, PartialEq, Eq)]
