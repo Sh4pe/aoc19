@@ -24,33 +24,40 @@ impl Program {
     }
 
     fn execute_step(&mut self, program_position: usize) -> Result<NextAction, IntcodeError> {
-        if program_position >= self.int_code.len() {
-            return Err(IntcodeError::ProgramPositionOutOfBounds(program_position));
-        }
-
-        let opcode = self.int_code[program_position];
+        let opcode = self.get_opcode(program_position)?;
         match opcode {
             1 | 2 => {
-                let modify_position_index = program_position + 3;
-                if modify_position_index >= self.int_code.len() {
-                    return Err(IntcodeError::ProgramPositionOutOfBounds(modify_position_index));
-                }
-                let modify_position = self.int_code[modify_position_index];
-                if modify_position < 0 || modify_position > self.int_code.len() as i64 {
-                    return Err(IntcodeError::ModifyPositionOutOfBounds(modify_position))
-                }
+                let (arg1, arg2, modify_position) = self.get_args_and_pos(program_position)?;
 
                 let new_value = if opcode == 1 {
-                    self.int_code[program_position + 1] + self.int_code[program_position + 2]
+                    arg1 + arg2
                 } else {
-                    self.int_code[program_position + 1] * self.int_code[program_position + 2]
+                    arg1 * arg2
                 };
                 self.int_code[modify_position as usize] = new_value;
-
+                
                 Ok(NextAction::Proceed)
             },
             99 => Ok(NextAction::Stop),
             i => Err(IntcodeError::UnknownOpcode(i, program_position))
+        }
+    }
+
+    fn get_args_and_pos(&self, position: usize) -> Result<(i64, i64, i64), IntcodeError> {
+        let modify_position = self.get_opcode(position + 3)?;
+
+        if modify_position < 0 || modify_position > self.int_code.len() as i64 {
+            Err(IntcodeError::ModifyPositionOutOfBounds(modify_position))
+        } else {
+            Ok((self.int_code[position + 1], self.int_code[position + 2], modify_position))
+        }
+    }
+
+    fn get_opcode(&self, position: usize) -> Result<i64, IntcodeError> {
+        if position > self.int_code.len() {
+            Err(IntcodeError::ProgramPositionOutOfBounds(position))
+        } else {
+            Ok(self.int_code[position])
         }
     }
 }
