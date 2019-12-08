@@ -17,6 +17,7 @@ pub enum RiddleError {
     IO(std::io::Error),
     ArgumentsCount(u8, u8),
     Generic(String),
+    NoSolutionFound,
 }
 
 impl fmt::Display for RiddleError {

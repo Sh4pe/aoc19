@@ -17,14 +17,7 @@ impl Advent2Riddle1 {
 
 impl Riddle for Advent2Riddle1 {
     fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
-        // TODO: get rid of the unwraps here
-        let file_content = fs::read_to_string(&self.input_file)?;
-        let numbers: Result<Vec<i64>, _> = file_content
-            .split(',')
-            .map(|s| s.trim().parse::<i64>() )
-            .collect();
-
-        let numbers = numbers.unwrap();
+        let numbers = get_numbers(&self.input_file)?;
         let mut program = Program::new(numbers);
 
         let noun = 12;
@@ -32,6 +25,43 @@ impl Riddle for Advent2Riddle1 {
         let result = program.run_with_parameters(noun, verb)?;
 
         Ok(Solution::Number(result))
+    }
+}
+
+fn get_numbers(input_file: &String) -> Result<Vec<i64>, RiddleError> {
+    let file_content = fs::read_to_string(input_file)?;
+    let numbers: Result<Vec<i64>, _> = file_content
+        .split(',')
+        .map(|s| s.trim().parse::<i64>() )
+        .collect();
+    Ok(numbers.unwrap())
+}
+
+pub struct Advent2Riddle2 {
+    input_file: String
+}
+
+impl Advent2Riddle2 {
+    pub fn new(input_file: &str) -> Advent2Riddle2 {
+        Advent2Riddle2{ input_file: input_file.to_string() }
+    }
+}
+
+impl Riddle for Advent2Riddle2 {
+    fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
+        let numbers = get_numbers(&self.input_file)?;
+        let target_result = 19690720;
+
+        for noun in 0..100 {
+            for verb in 0..100 {
+                let mut program = Program::new(numbers.clone());
+                let result = program.run_with_parameters(noun, verb)?;
+                if result == target_result {
+                    return Ok(Solution::Number(100*noun + verb))
+                }
+            }
+        }
+        Err(RiddleError::NoSolutionFound)
     }
 }
 
@@ -149,6 +179,19 @@ mod advent2_tests {
             let solution = riddle.solve(&vec![]).unwrap();
 
             assert_eq!(solution, Solution::Number(4023471));
+        }
+    }
+
+    mod riddle2_test {
+        use super::super::{Advent2Riddle2};
+        use super::super::super::{Riddle, Solution};
+
+        #[test]
+        fn it_works_as_expected() {
+            let riddle = Advent2Riddle2::new("./data/input/2.txt");
+            let solution = riddle.solve(&vec![]).unwrap();
+
+            assert_eq!(solution, Solution::Number(8051));
         }
     }
 
