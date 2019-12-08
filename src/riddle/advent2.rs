@@ -24,16 +24,14 @@ impl Riddle for Advent2Riddle1 {
             .map(|s| s.trim().parse::<i64>() )
             .collect();
 
-        let mut numbers = numbers.unwrap();
-        numbers[1] = 12;
-        numbers[2] = 2;
-
+        let numbers = numbers.unwrap();
         let mut program = Program::new(numbers);
 
-        program.execute()?;
-        let first_opcode = program.get_opcode(0).unwrap();
+        let noun = 12;
+        let verb = 2;
+        let result = program.run_with_parameters(noun, verb)?;
 
-        Ok(Solution::Number(first_opcode))
+        Ok(Solution::Number(result))
     }
 }
 
@@ -53,7 +51,8 @@ pub enum IntcodeError {
     UnknownOpcode(i64, usize),
     ProgramPositionOutOfBounds(usize),
     ModifyPositionOutOfBounds(i64),
-    ArgumentPositionOutOfBounds(usize, i64)
+    ArgumentPositionOutOfBounds(usize, i64),
+    ProgramTooShort(usize),
 }
 
 #[derive(Eq, PartialEq, Debug)]
@@ -63,10 +62,22 @@ pub struct Program {
 
 impl Program {
     pub fn new(int_code: Vec<i64>) -> Program {
+        assert!(int_code.len() >= 1);
         Program{ int_code }
     }
 
-    pub fn execute(&mut self) -> Result<(), IntcodeError> {
+    pub fn run_with_parameters(&mut self, noun: i64, verb: i64) -> Result<i64, IntcodeError> {
+        let int_code_len = self.int_code.len();
+        if int_code_len <= 4 {
+            return Err(IntcodeError::ProgramPositionOutOfBounds(int_code_len));
+        }
+        self.int_code[1] = noun;
+        self.int_code[2] = verb;
+        self.run()?;
+        Ok(self.int_code[0])
+    }
+
+    fn run(&mut self) -> Result<(), IntcodeError> {
         let opcodes = self.int_code.len();
         let highest_idx = opcodes - opcodes % 4;
         for i in (0..highest_idx).step_by(4) {
@@ -142,7 +153,18 @@ mod advent2_tests {
     }
 
     mod program_tests {
-        mod execute_tests {
+        mod run_with_parameters_tests {
+            use super::super::super::{Program};
+
+            #[test]
+            fn it_works_as_expected() {
+                let mut program = Program::new(vec![1,0,0,0,99]);
+                let result = program.run_with_parameters(4, 1).unwrap();
+                assert_eq!(result, 103);
+            }
+        }
+
+        mod run_tests {
             use super::super::super::{Program};
 
             #[test]
@@ -158,7 +180,7 @@ mod advent2_tests {
                     let mut input = Program::new(input);
                     let output = Program::new(output);
 
-                    input.execute().unwrap();
+                    input.run().unwrap();
                     assert_eq!(input, output);
                 }
             }
