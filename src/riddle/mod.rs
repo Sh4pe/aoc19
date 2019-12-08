@@ -16,6 +16,7 @@ pub enum RiddleError {
     UnknownRiddle(String),
     IO(std::io::Error),
     ArgumentsCount(u8, u8),
+    Generic(String),
 }
 
 impl fmt::Display for RiddleError {

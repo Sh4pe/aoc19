@@ -23,14 +23,22 @@ impl Riddle for Advent2Riddle1 {
             .split(',')
             .map(|s| s.trim().parse::<i64>() )
             .collect();
-        let numbers = numbers.unwrap();
+
+        let mut numbers = numbers.unwrap();
+        numbers[1] = 12;
+        numbers[2] = 2;
+
         let mut program = Program::new(numbers);
 
-        program.execute();
+        program.execute()?;
         let first_opcode = program.get_opcode(0).unwrap();
 
         Ok(Solution::Number(first_opcode))
     }
+}
+
+impl std::convert::From<IntcodeError> for RiddleError {
+    fn from(err: IntcodeError) -> Self { RiddleError::Generic(format!("{:?}", err)) }
 }
 
 
@@ -120,6 +128,19 @@ impl Program {
 
 #[cfg(test)]
 mod advent2_tests {
+    mod riddle1_test {
+        use super::super::{Advent2Riddle1};
+        use super::super::super::{Riddle, Solution};
+
+        #[test]
+        fn it_works_as_expected() {
+            let riddle = Advent2Riddle1::new("./data/input/2.txt");
+            let solution = riddle.solve(&vec![]).unwrap();
+
+            assert_eq!(solution, Solution::Number(4023471));
+        }
+    }
+
     mod program_tests {
         mod execute_tests {
             use super::super::super::{Program};
