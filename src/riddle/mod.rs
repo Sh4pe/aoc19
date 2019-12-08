@@ -31,6 +31,10 @@ impl std::convert::From<RiddleError> for std::io::Error {
     fn from(err: RiddleError) -> Self { std::io::Error::new(ErrorKind::Other, err) }
 }
 
+impl std::convert::From<std::io::Error> for RiddleError {
+    fn from(err: std::io::Error) -> Self { RiddleError::IO(err) }
+}
+
 pub trait Riddle {
     fn solve(&self, args: &[String]) -> Result<Solution, RiddleError>;
 }

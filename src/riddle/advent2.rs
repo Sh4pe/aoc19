@@ -1,4 +1,38 @@
 use std::vec::{Vec};
+use std::fs;
+
+use super::{Riddle, Solution, RiddleError};
+
+
+pub struct Advent2Riddle1 {
+    input_file: String
+}
+
+impl Advent2Riddle1 {
+    pub fn new(input_file: &str) -> Advent2Riddle1 {
+        let input_file = input_file.to_string();
+        Advent2Riddle1{ input_file }
+    }
+}
+
+impl Riddle for Advent2Riddle1 {
+    fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
+        // TODO: get rid of the unwraps here
+        let file_content = fs::read_to_string(&self.input_file)?;
+        let numbers: Result<Vec<i64>, _> = file_content
+            .split(',')
+            .map(|s| s.trim().parse::<i64>() )
+            .collect();
+        let numbers = numbers.unwrap();
+        let mut program = Program::new(numbers);
+
+        program.execute();
+        let first_opcode = program.get_opcode(0).unwrap();
+
+        Ok(Solution::Number(first_opcode))
+    }
+}
+
 
 #[derive(PartialEq, Eq, Debug)]
 enum NextAction {
@@ -75,7 +109,7 @@ impl Program {
         Ok(self.int_code[argument_pos as usize])
     }
 
-    fn get_opcode(&self, position: usize) -> Result<i64, IntcodeError> {
+    pub fn get_opcode(&self, position: usize) -> Result<i64, IntcodeError> {
         if position > self.int_code.len() {
             Err(IntcodeError::ProgramPositionOutOfBounds(position))
         } else {
