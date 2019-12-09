@@ -22,11 +22,7 @@ fn main() -> Result<(), std::io::Error> {
         args[1..].to_vec()
     };
 
-    println!("Hello, world! {:?}", args);
-
     let result = riddles.solve_riddle(riddle, &remaining_args)?;
-
     println!("result: {:?}", result);
-
     Ok(())
 }

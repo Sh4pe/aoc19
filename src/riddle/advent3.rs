@@ -1,9 +1,11 @@
 use std::str;
 use std::num::{ParseIntError};
 use std::convert::{From};
+use std::collections::{HashSet};
+use std::iter::{FromIterator, Extend};
 
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum Segment {
     R(usize),
     L(usize),
@@ -61,7 +63,7 @@ impl str::FromStr for Segment {
     }
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Hash, Clone)]
 pub struct Point {
     pub x: i64,
     pub y: i64
@@ -72,7 +74,7 @@ impl Point {
         (self.x.abs() as usize) + (self.y.abs() as usize)
     }
 
-    pub fn points_in_seqment(&self, segment: Segment) -> Vec<Point> {
+    pub fn points_in_segment(&self, segment: Segment) -> Vec<Point> {
         let (x_increment, y_increment) : (i64, i64) = match segment {
             Segment::U(_) => (0,  1),
             Segment::D(_) => (0, -1),
@@ -87,6 +89,24 @@ impl Point {
                 Point{ x: self.x + i*x_increment, y: self.y + i*y_increment } 
             })
             .collect()
+    }
+
+    pub fn points_in_path(&self, path: Vec<Segment>) -> HashSet<Point> {
+        if path.len() == 0 {
+            return HashSet::new();
+        }
+
+        let first_segment = self.points_in_segment(path[0]);
+        let mut start_point = (*first_segment.last().unwrap()).clone();
+        let mut result = HashSet::<Point>::from_iter(first_segment);
+        if path.len() > 1 {
+            for segment in path.iter().skip(1) {
+                let this_segment = start_point.points_in_segment(*segment);
+                start_point = (*this_segment.last().unwrap()).clone();
+                result.extend(this_segment);
+            }
+        }
+        result
     }
 }
 
@@ -147,6 +167,8 @@ mod advent3_tests {
 
     mod point_tests {
         use super::super::{Point, Segment};
+        use std::collections::{HashSet};
+        use std::iter::FromIterator;
 
         #[test]
         fn the_norm_works_as_expected() {
@@ -169,10 +191,30 @@ mod advent3_tests {
                     .iter()
                     .map( |p| Point{ x: p.0, y: p.1} )
                     .collect();
-                let points_in_segment = origin.points_in_seqment(segment);
+                let points_in_segment = origin.points_in_segment(segment);
 
                 assert_eq!(points_in_segment, expected);
             }
+        }
+
+        #[test]
+        fn points_in_path_works_as_expected() {
+            let calculated_path_points = Point{ x: 0, y:0 }.points_in_path(
+                vec![Segment::R(4), Segment::U(4), Segment::L(4), Segment::D(2), Segment::R(6)]
+            );
+            let expected_points = {
+                let points : Vec<_> = vec![
+                        (1,0),(2,0),(3,0),(4,0),
+                        (4,1),(4,2),(4,3),(4,4),
+                        (3,4),(2,4),(1,4),(0,4),
+                        (0,3),(0,2),
+                        (1,2),(2,2),(2,2),(3,2),(5,2),(6,2)
+                    ].iter()
+                     .map( |(x,y)| Point{ x: *x, y: *y } )
+                     .collect();
+                HashSet::from_iter(points)
+            };
+            assert_eq!(expected_points, calculated_path_points);
         }
     }
 
