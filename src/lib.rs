@@ -1,2 +1,2 @@
-pub mod riddle;
 pub mod io;
+pub mod riddle;

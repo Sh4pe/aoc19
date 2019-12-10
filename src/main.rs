@@ -1,16 +1,19 @@
 use std::env;
 use std::io::{Error, ErrorKind};
-use std::vec::{Vec};
+use std::vec::Vec;
 
-use aoc19::riddle::riddlecontainer::{RiddleContainer};
+use aoc19::riddle::riddlecontainer::RiddleContainer;
 
 fn main() -> Result<(), std::io::Error> {
     let riddles = RiddleContainer::new();
 
     let args = {
-        let args : Vec<String> = env::args().collect();
+        let args: Vec<String> = env::args().collect();
         if args.len() <= 1 {
-            return Err(Error::new(ErrorKind::Other, "expected at least one argument"))
+            return Err(Error::new(
+                ErrorKind::Other,
+                "expected at least one argument",
+            ));
         }
         args
     };

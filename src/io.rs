@@ -1,7 +1,7 @@
 use std::fs::File;
-use std::io::{BufReader, BufRead, Lines, Error};
-use std::vec::{Vec};
-use std::num::{ParseIntError};
+use std::io::{BufRead, BufReader, Error, Lines};
+use std::num::ParseIntError;
+use std::vec::Vec;
 
 type FileLines = Lines<BufReader<File>>;
 
@@ -15,42 +15,44 @@ pub fn lines_from_file(filename: &str) -> Result<FileLines, Error> {
 pub enum IntsError {
     Convert(ParseIntError),
     ReadLine,
-    IO(Error)
+    IO(Error),
 }
 
 impl std::convert::From<std::io::Error> for IntsError {
-    fn from(err: std::io::Error) -> Self { IntsError::IO(err) }
+    fn from(err: std::io::Error) -> Self {
+        IntsError::IO(err)
+    }
 }
 
 impl std::convert::From<ParseIntError> for IntsError {
-    fn from(err: ParseIntError) -> Self { IntsError::Convert(err) }
+    fn from(err: ParseIntError) -> Self {
+        IntsError::Convert(err)
+    }
 }
 
 pub fn ints_from_file(filename: &str) -> Result<Vec<i64>, IntsError> {
     let lines = lines_from_file(filename)?;
-    let result : Result<Vec<i64>, _> = lines.map( |line| {
-        Ok(line?.parse::<i64>()?)
-    }).collect();
+    let result: Result<Vec<i64>, _> = lines.map(|line| Ok(line?.parse::<i64>()?)).collect();
     result
 }
 
 #[cfg(test)]
 mod io_tests {
     mod lines_from_file_test {
-        use super::super::{lines_from_file};
+        use super::super::lines_from_file;
 
         #[test]
         fn it_works_with_str() {
-            let lines : Vec<_> = lines_from_file(
-                "./data/test/io/lines_from_file/three_lines.txt"
-            ).unwrap().collect();
+            let lines: Vec<_> = lines_from_file("./data/test/io/lines_from_file/three_lines.txt")
+                .unwrap()
+                .collect();
             assert_eq!(3, lines.len());
         }
 
         #[test]
         fn it_works_with_string() {
             let path = String::from("./data/test/io/lines_from_file/three_lines.txt");
-            let lines : Vec<_> = lines_from_file(&path).unwrap().collect();
+            let lines: Vec<_> = lines_from_file(&path).unwrap().collect();
             assert_eq!(3, lines.len());
         }
     }
@@ -60,9 +62,7 @@ mod io_tests {
 
         #[test]
         fn it_works_in_normal_cases() {
-            let ints = ints_from_file(
-                "./data/test/io/ints_from_file/ints.txt"
-            ).unwrap();
+            let ints = ints_from_file("./data/test/io/ints_from_file/ints.txt").unwrap();
 
             assert_eq!(ints, vec![1, -1, 100, 9999]);
         }
@@ -73,7 +73,7 @@ mod io_tests {
             match ints_from_file(path) {
                 Err(IntsError::Convert(_)) => Ok(()),
                 Ok(_) => Err(String::from("expected error")),
-                Err(_) =>  Err(String::from("expected convert error"))
+                Err(_) => Err(String::from("expected convert error")),
             }
         }
     }

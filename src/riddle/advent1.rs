@@ -1,14 +1,14 @@
-use super::{Riddle, Solution, RiddleError};
-use super::super::io::{ints_from_file};
+use super::super::io::ints_from_file;
+use super::{Riddle, RiddleError, Solution};
 
 pub struct Advent1Riddle1 {
-    input_file: String
+    input_file: String,
 }
 
 impl Advent1Riddle1 {
     pub fn new(input_file: &str) -> Advent1Riddle1 {
         let input_file = input_file.to_string();
-        Advent1Riddle1{ input_file }
+        Advent1Riddle1 { input_file }
     }
 }
 
@@ -18,20 +18,20 @@ impl Riddle for Advent1Riddle1 {
 
         let result = ints
             .iter()
-            .map( |&x| calculate_fuel(x) )
-            .fold(0, |acc, x| acc + x );
+            .map(|&x| calculate_fuel(x))
+            .fold(0, |acc, x| acc + x);
         Ok(Solution::Number(result))
     }
 }
 
 pub struct Advent1Riddle2 {
-    input_file: String
+    input_file: String,
 }
 
 impl Advent1Riddle2 {
     pub fn new(input_file: &str) -> Advent1Riddle2 {
         let input_file = input_file.to_string();
-        Advent1Riddle2{ input_file }
+        Advent1Riddle2 { input_file }
     }
 }
 
@@ -41,8 +41,8 @@ impl Riddle for Advent1Riddle2 {
 
         let result = ints
             .iter()
-            .map( |&x| calculate_fuel_recursive(x) )
-            .fold(0, |acc, x| acc + x );
+            .map(|&x| calculate_fuel_recursive(x))
+            .fold(0, |acc, x| acc + x);
         Ok(Solution::Number(result))
     }
 }
@@ -52,7 +52,7 @@ pub fn calculate_fuel(mass: i64) -> i64 {
     if mass <= 6 {
         0
     } else {
-        mass/3 - 2
+        mass / 3 - 2
     }
 }
 
@@ -96,8 +96,8 @@ mod advent1_tests {
     }
 
     mod riddle1_test {
-        use super::super::Advent1Riddle1;
         use super::super::super::{Riddle, Solution};
+        use super::super::Advent1Riddle1;
 
         #[test]
         fn it_works_as_expected() {
@@ -106,11 +106,11 @@ mod advent1_tests {
 
             assert_eq!(solution, Solution::Number(3210097));
         }
-    } 
+    }
 
     mod riddle2_test {
-        use super::super::Advent1Riddle2;
         use super::super::super::{Riddle, Solution};
+        use super::super::Advent1Riddle2;
 
         #[test]
         fn it_works_as_expected() {
