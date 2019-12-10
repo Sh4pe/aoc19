@@ -27,7 +27,7 @@ impl Riddle for Advent2Riddle1 {
     }
 }
 
-fn get_numbers(input_file: &String) -> Result<Vec<i64>, RiddleError> {
+fn get_numbers(input_file: &str) -> Result<Vec<i64>, RiddleError> {
     let file_content = fs::read_to_string(input_file)?;
     let numbers: Result<Vec<i64>, _> = file_content
         .split(',')
@@ -51,7 +51,7 @@ impl Advent2Riddle2 {
 impl Riddle for Advent2Riddle2 {
     fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
         let numbers = get_numbers(&self.input_file)?;
-        let target_result = 19690720;
+        let target_result = 19_690_720;
 
         for noun in 0..100 {
             for verb in 0..100 {
@@ -94,7 +94,7 @@ pub struct Program {
 
 impl Program {
     pub fn new(int_code: Vec<i64>) -> Program {
-        assert!(int_code.len() >= 1);
+        assert!(!int_code.is_empty());
         Program { int_code }
     }
 

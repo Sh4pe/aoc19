@@ -16,10 +16,7 @@ impl Riddle for Advent1Riddle1 {
     fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
         let ints = ints_from_file(&self.input_file).unwrap();
 
-        let result = ints
-            .iter()
-            .map(|&x| calculate_fuel(x))
-            .fold(0, |acc, x| acc + x);
+        let result = ints.iter().map(|&x| calculate_fuel(x)).sum();
         Ok(Solution::Number(result))
     }
 }
@@ -39,10 +36,7 @@ impl Riddle for Advent1Riddle2 {
     fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
         let ints = ints_from_file(&self.input_file).unwrap();
 
-        let result = ints
-            .iter()
-            .map(|&x| calculate_fuel_recursive(x))
-            .fold(0, |acc, x| acc + x);
+        let result = ints.iter().map(|&x| calculate_fuel_recursive(x)).sum();
         Ok(Solution::Number(result))
     }
 }

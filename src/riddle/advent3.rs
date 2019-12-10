@@ -34,7 +34,7 @@ impl Riddle for Advent3Riddle1 {
 
         min_distance
             .map(|n| Solution::Number(n as i64))
-            .ok_or(RiddleError::Generic("could not determine min".to_string()))
+            .ok_or_else(|| RiddleError::Generic("could not determine min".to_string()))
     }
 }
 
@@ -140,7 +140,7 @@ impl Point {
     }
 
     pub fn points_in_path(&self, path: &Vec<Segment>) -> HashSet<Point> {
-        if path.len() == 0 {
+        if path.is_empty() {
             return HashSet::new();
         }
 
