@@ -4,6 +4,13 @@ use std::convert::{From};
 use std::collections::{HashSet};
 use std::iter::{FromIterator, Extend};
 
+fn points_in_both_paths(path1: &Vec<Segment>, path2: &Vec<Segment>) -> HashSet<Point> {
+    let origin = Point{ x:0, y: 0};
+    let points1 = origin.points_in_path(path1);
+    let points2 = origin.points_in_path(path2);
+    let intersection: HashSet<_> = points1.intersection(&points2).cloned().collect();
+    intersection
+}
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum Segment {
@@ -91,7 +98,7 @@ impl Point {
             .collect()
     }
 
-    pub fn points_in_path(&self, path: Vec<Segment>) -> HashSet<Point> {
+    pub fn points_in_path(&self, path: &Vec<Segment>) -> HashSet<Point> {
         if path.len() == 0 {
             return HashSet::new();
         }
@@ -112,6 +119,26 @@ impl Point {
 
 #[cfg(test)]
 mod advent3_tests {
+
+    mod points_in_both_paths_tests {
+        use super::super::{Segment, points_in_both_paths, Point};
+        use std::collections::HashSet;
+
+        #[test]
+        fn it_works_as_expected() {
+            let path1 = vec![Segment::R(8), Segment::U(5), Segment::L(5), Segment::D(3)];
+            let path2 = vec![Segment::U(7), Segment::R(6), Segment::D(4), Segment::L(4)];
+            let intersection = points_in_both_paths(&path1, &path2);
+            let expected: HashSet<Point> = {
+                let mut s = HashSet::new();
+                s.insert(Point{ x:3, y: 3});
+                s.insert(Point{ x:6, y: 5});
+                s
+            };
+
+            assert_eq!(intersection, expected);
+        }
+    }
 
     mod segment_tests {
 
@@ -200,7 +227,7 @@ mod advent3_tests {
         #[test]
         fn points_in_path_works_as_expected() {
             let calculated_path_points = Point{ x: 0, y:0 }.points_in_path(
-                vec![Segment::R(4), Segment::U(4), Segment::L(4), Segment::D(2), Segment::R(6)]
+                &vec![Segment::R(4), Segment::U(4), Segment::L(4), Segment::D(2), Segment::R(6)]
             );
             let expected_points = {
                 let points : Vec<_> = vec![
