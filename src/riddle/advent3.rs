@@ -12,6 +12,13 @@ fn points_in_both_paths(path1: &Vec<Segment>, path2: &Vec<Segment>) -> HashSet<P
     intersection
 }
 
+fn from_comma_separated_str(input: &str) -> Result<Vec<Segment>, SegmentParseError> {
+    input
+        .split(',')
+        .map(|s| s.parse::<Segment>() )
+        .collect()
+}
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum Segment {
     R(usize),
@@ -119,6 +126,18 @@ impl Point {
 
 #[cfg(test)]
 mod advent3_tests {
+
+    mod from_comma_separated_str_tests {
+        use super::super::{from_comma_separated_str, Segment};
+
+        #[test]
+        fn it_works_as_expected() {
+            let segments = from_comma_separated_str("R5,U3,D8").unwrap();
+            let expected = vec![Segment::R(5), Segment::U(3), Segment::D(8)];
+            assert_eq!(segments, expected);
+        }
+
+    }
 
     mod points_in_both_paths_tests {
         use super::super::{Segment, points_in_both_paths, Point};
