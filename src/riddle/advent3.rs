@@ -4,6 +4,42 @@ use std::convert::{From};
 use std::collections::{HashSet};
 use std::iter::{FromIterator, Extend};
 
+use super::{RiddleError, Riddle, Solution};
+use super::super::io::lines_from_file;
+
+pub struct Advent3Riddle1 {
+    input_file: String
+}
+
+impl Advent3Riddle1 {
+    pub fn new(input_file: &str) -> Advent3Riddle1 {
+        Advent3Riddle1{ input_file: input_file.to_string() }
+    }
+}
+
+impl Riddle for Advent3Riddle1 {
+    fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
+        let lines_result: Result<Vec<_>, _> = lines_from_file(&self.input_file)?
+            .map(|x| x)
+            .collect();
+        let lines = lines_result?; 
+        assert_eq!(lines.len(), 2);
+
+        let path1 = from_comma_separated_str(&lines[0]).unwrap();
+        let path2 = from_comma_separated_str(&lines[1]).unwrap();
+        let in_both_parts = points_in_both_paths(&path1, &path2);
+
+        let min_distance = in_both_parts
+            .iter()
+            .map( |p| p.manhattan_norm() )
+            .min();
+
+        min_distance
+            .map(|n| Solution::Number(n as i64))
+            .ok_or(RiddleError::Generic("could not determine min".to_string()))
+    }
+}
+
 fn points_in_both_paths(path1: &Vec<Segment>, path2: &Vec<Segment>) -> HashSet<Point> {
     let origin = Point{ x:0, y: 0};
     let points1 = origin.points_in_path(path1);
@@ -126,6 +162,19 @@ impl Point {
 
 #[cfg(test)]
 mod advent3_tests {
+
+    mod riddle1_test {
+        use super::super::{Advent3Riddle1};
+        use super::super::super::{Riddle, Solution};
+
+        #[test]
+        fn it_works_as_expected() {
+            let riddle = Advent3Riddle1::new("./data/input/3.txt");
+            let solution = riddle.solve(&vec![]).unwrap();
+
+            assert_eq!(solution, Solution::Number(4981));
+        }
+    }
 
     mod from_comma_separated_str_tests {
         use super::super::{from_comma_separated_str, Segment};
