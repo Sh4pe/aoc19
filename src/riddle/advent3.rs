@@ -144,6 +144,15 @@ impl Point {
         HashSet::from_iter(points)
     }
 
+    pub fn index_of_point_in_path(&self, point: &Self, path: &Vec<Segment>) -> Option<usize> {
+        for (i, p) in self.points_in_path(path).iter().enumerate() {
+            if p == point {
+                return Some(i+1)
+            }
+        }
+        None
+    }
+
     pub fn points_in_path(&self, path: &Vec<Segment>) -> Vec<Point> {
         let mut result = Vec::new();
         let mut start_point = self.clone();
