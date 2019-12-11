@@ -21,13 +21,7 @@ impl Advent3Riddle1 {
 
 impl Riddle for Advent3Riddle1 {
     fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
-        let lines_result: Result<Vec<_>, _> =
-            lines_from_file(&self.input_file)?.map(|x| x).collect();
-        let lines = lines_result?;
-        assert_eq!(lines.len(), 2);
-
-        let path1 = from_comma_separated_str(&lines[0]).unwrap();
-        let path2 = from_comma_separated_str(&lines[1]).unwrap();
+        let (path1, path2) = get_paths_from_file(&self.input_file);
         let in_both_parts = points_in_both_paths(&path1, &path2);
 
         let min_distance = in_both_parts.iter().map(|p| p.manhattan_norm()).min();
@@ -36,6 +30,48 @@ impl Riddle for Advent3Riddle1 {
             .map(|n| Solution::Number(n as i64))
             .ok_or_else(|| RiddleError::Generic("could not determine min".to_string()))
     }
+}
+
+pub struct Advent3Riddle2 {
+    input_file: String,
+}
+
+impl Advent3Riddle2 {
+    pub fn new(input_file: &str) -> Advent3Riddle2 {
+        Advent3Riddle2 {
+            input_file: input_file.to_string(),
+        }
+    }
+}
+
+impl Riddle for Advent3Riddle2 {
+    fn solve(&self, _: &[String]) -> Result<Solution, RiddleError> {
+        let (path1, path2) = get_paths_from_file(&self.input_file);
+        let in_both_parts = points_in_both_paths(&path1, &path2);
+
+        let origin = Point{ x:0, y:0 };
+        let signal_distances: Vec<_> = in_both_parts
+            .iter()
+            .map(|point| {
+                let index_path_1 = origin.index_of_point_in_path(point, &path1).unwrap();
+                let index_path_2 = origin.index_of_point_in_path(point, &path2).unwrap();
+                index_path_1 + index_path_2
+            })
+            .collect();
+
+        Ok(Solution::Number(*signal_distances.iter().min().unwrap() as i64))
+    }
+}
+
+fn get_paths_from_file(filename: &String) -> (Vec<Segment>, Vec<Segment>) {
+    let lines_result: Result<Vec<_>, _> =
+        lines_from_file(filename).unwrap().collect();
+    let lines = lines_result.unwrap();
+    assert_eq!(lines.len(), 2);
+
+    let path1 = from_comma_separated_str(&lines[0]).unwrap();
+    let path2 = from_comma_separated_str(&lines[1]).unwrap();
+    (path1, path2)
 }
 
 fn points_in_both_paths(path1: &Vec<Segment>, path2: &Vec<Segment>) -> HashSet<Point> {
@@ -178,6 +214,19 @@ mod advent3_tests {
             let solution = riddle.solve(&vec![]).unwrap();
 
             assert_eq!(solution, Solution::Number(4981));
+        }
+    }
+
+    mod riddle2_test {
+        use super::super::super::{Riddle, Solution};
+        use super::super::Advent3Riddle2;
+
+        #[test]
+        fn it_works_as_expected() {
+            let riddle = Advent3Riddle2::new("./data/input/3.txt");
+            let solution = riddle.solve(&vec![]).unwrap();
+
+            assert_eq!(solution, Solution::Number(164012));
         }
     }
 
