@@ -40,8 +40,8 @@ impl Riddle for Advent3Riddle1 {
 
 fn points_in_both_paths(path1: &Vec<Segment>, path2: &Vec<Segment>) -> HashSet<Point> {
     let origin = Point { x: 0, y: 0 };
-    let points1 = origin.points_in_path(path1);
-    let points2 = origin.points_in_path(path2);
+    let points1 = origin.point_set_in_path(path1);
+    let points2 = origin.point_set_in_path(path2);
     let intersection: HashSet<_> = points1.intersection(&points2).cloned().collect();
     intersection
 }
@@ -139,7 +139,7 @@ impl Point {
             .collect()
     }
 
-    pub fn points_in_path(&self, path: &Vec<Segment>) -> HashSet<Point> {
+    pub fn point_set_in_path(&self, path: &Vec<Segment>) -> HashSet<Point> {
         if path.is_empty() {
             return HashSet::new();
         }
@@ -303,8 +303,8 @@ mod advent3_tests {
         }
 
         #[test]
-        fn points_in_path_works_as_expected() {
-            let calculated_path_points = Point { x: 0, y: 0 }.points_in_path(&vec![
+        fn point_set_in_path_works_as_expected() {
+            let calculated_path_points = Point { x: 0, y: 0 }.point_set_in_path(&vec![
                 Segment::R(4),
                 Segment::U(4),
                 Segment::L(4),
